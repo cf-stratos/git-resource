@@ -49,6 +49,7 @@ gpg_keyserver=$(jq -r '.source.gpg_keyserver // "hkp://ipv4.pool.sks-keyservers.
 disable_git_lfs=$(jq -r '(.params.disable_git_lfs // false)' < $payload)
 clean_tags=$(jq -r '(.params.clean_tags // false)' < $payload)
 short_ref_format=$(jq -r '(.params.short_ref_format // "%s")' < $payload)
+script=$(jq -r '.params.script // ""' < $payload)
 
 configure_git_global "${git_config_payload}"
 
@@ -192,6 +193,10 @@ metadata=$(git_metadata)
 
 if [ "$clean_tags" == "true" ]; then
   git tag | xargs git tag -d
+fi
+
+if [ -n "$script" ]; then
+  $script
 fi
 
 jq -n "{
